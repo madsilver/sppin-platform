@@ -1,0 +1,55 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">>
+<link rel="import" href="../../../components/shared-styles.html">
+<link rel="import" href="../logs/page-logs.html">
+<link rel="import" href="../modules/page-modules.html">
+<link rel="import" href="../permissions/page-permissions.html">
+
+<dom-module id="page-settings">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+            paper-tabs {
+                width: 300px;
+                --paper-tabs-selection-bar-color: #039BE5;
+            }
+            paper-tab.iron-selected {
+                color: #039BE5;
+            }
+        </style>
+        
+        <paper-tabs selected="{{selected}}">
+            <paper-tab>Permissões</paper-tab>
+            <paper-tab>Módulos</paper-tab>
+            
+        </paper-tabs>
+        <iron-pages selected="{{selected}}">
+            <div class="container">
+                <page-permissions></page-permissions>
+            </div>
+            <div class="container">
+                <page-modules></page-modules>
+            </div>
+        </iron-pages>
+
+    </template>
+
+    <script>
+        class PageSettings extends Polymer.Element {
+            static get is() { return 'page-settings'; }
+
+            static get properties() {
+                return {
+                    selected: {
+                        type: Number,
+                        value: 0
+                    }
+                };  
+            }
+        }
+
+        window.customElements.define(PageSettings.is, PageSettings);
+    </script>
+</dom-module>

@@ -1,0 +1,212 @@
+<link rel="import" href="../components/elements.html">
+
+<dom-module id="scs-app">
+    <template>
+        <style>
+            :host {
+                --app-primary-color: var(--paper-blue-grey-800);
+
+                display: block;
+            }
+
+            app-header {
+                color: #fff;
+                background-color: var(--app-primary-color);
+                box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
+            }
+
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: #fff;
+            }
+            app-drawer-layout {
+                --app-drawer-layout-content-transition: margin 0.2s;
+            }
+
+            app-drawer {
+                --app-drawer-content-container: {
+                    background-color: #eee;
+                }
+            }
+            .drawer-content {
+                margin-top: 80px;
+                height: calc(100% - 80px);
+                overflow: auto;
+            }
+
+            [main-title] {
+                margin-left: 20px;
+            }
+            .logoff {
+                height: 30px;
+                color: var(--paper-pink-500);
+            }
+            p[center] {
+                text-align: center;
+                font-size: 14px;
+                color: var(--paper-grey-500);
+            }
+        </style>
+
+        <app-location
+            route="{{route}}"
+            url-space-regex="^[[rootPath]]">
+        </app-location>
+
+        <app-route
+            route="{{route}}"
+            pattern="[[rootPath]]:page"
+            data="{{routeData}}"
+            tail="{{subroute}}">
+        </app-route>
+
+        <app-header-layout>
+            <app-header fixed effects="waterfall" slot="header">
+                <app-toolbar>
+                    <paper-icon-button icon="elem-icons:menu" on-tap="_tapMenu"></paper-icon-button>
+                    <div main-title>Sppin Cloud Service</div>
+                    <paper-icon-button icon="polymer" on-tap="_tapUser"></paper-icon-button>
+                </app-toolbar>
+            </app-header>
+
+            <app-drawer-layout id="drawerLayout">
+
+                <app-drawer slot="drawer">
+                    <div class="drawer-content">
+                        <!-- menu -->
+                        <elem-menu page="[[page]]" links="[[links]]"></elem-menu>
+                    </div>
+                </app-drawer>
+
+                <iron-pages
+                    selected="[[page]]"
+                    attr-for-selected="name"
+                    fallback-selection="404"
+                    role="main"
+                    id="ironPages">
+                    <page-404 name="404"></page-404>
+
+                    <page-home name="home"></page-home>
+                    <page-users name="users"></page-users>
+                    <page-logs name="logs"></page-logs>
+                    <page-settings name="settings"></page-settings>
+                </iron-pages>
+
+            </app-drawer-layout>
+
+            <app-drawer id="draweruser" align="right" swipe-open>
+                <div class="drawer-content">
+                    <p center>
+                        <img src="images/empty_user.png" style="width:185px">
+                    </p>
+                    <p center>
+                        <span>{{user.name}}</span><br>
+                        <span>{{user.email}}</span>
+                    </p>
+                    <p center>
+                        <paper-button raised on-tap="_tapLogoff" class="logoff">Sair</paper-button>
+                    </p>
+                </div>
+            </app-drawer>
+
+        </app-header-layout>
+
+        <paper-toast id="toast"></paper-toast>
+
+    </template>
+
+    <script>
+        // Gesture events like tap and track generated from touch will not be
+        // preventable, allowing for better scrolling performance.
+        Polymer.setPassiveTouchGestures(true);
+
+        class ScsApp extends Polymer.Element {
+            static get is() {
+                return 'scs-app';
+            }
+
+            static get properties() {
+                return {
+                    page: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_pageChanged',
+                    },
+                    user: Object,
+                    routeData: Object,
+                    subroute: Object,
+                    // This shouldn't be neccessary, but the Analyzer isn't picking up
+                    // Polymer.Element#rootPath
+                    rootPath: String,
+                    links: Array,
+                };
+            }
+
+            static get observers() {
+                return [
+                    '_routePageChanged(routeData.page)',
+                ];
+            }
+
+            constructor() {
+                super();
+                this._fetchLinks();
+            }
+
+            ready() {
+                super.ready();
+                Polymer.toastElement = this.$.toast;
+
+                if(sessionStorage.user)
+                    this.user = JSON.parse(sessionStorage.user);
+            }
+
+            _fetchLinks() {
+                let self = this;
+
+                Utils.fetchApi({
+                    resource: 'modules'
+                }, res => {
+                    self.links = res;
+                }, error => {
+                    Utils.toast(error.message, false);
+                });
+            }
+
+            _routePageChanged(page) {
+                this.page = page || 'home';
+            }
+
+            _pageChanged(page) {
+              // Load page import on demand. Show 404 page if fails
+                const resolvedPageUrl = this.resolveUrl('pages/' + page + '/page-' + page + '.html');
+                Polymer.importHref(
+                    resolvedPageUrl,
+                    null,
+                    this._showPage404.bind(this),
+                    true);
+            }
+
+            _showPage404() {
+                this.page = '404';
+            }
+
+            _tapMenu() {
+                if (this.$.drawerLayout.forceNarrow || !this.$.drawerLayout.narrow) {
+                    this.$.drawerLayout.forceNarrow = !this.$.drawerLayout.forceNarrow;
+                } else {
+                    this.$.drawerLayout.drawer.toggle();
+                }
+            }
+
+            _tapUser() {
+                this.$.draweruser.toggle();
+            }
+
+            _tapLogoff() {
+                Utils.logoff();
+            }
+        }
+
+        window.customElements.define(ScsApp.is, ScsApp);
+    </script>
+</dom-module>

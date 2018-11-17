@@ -1,0 +1,72 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<!-- shared styles for all views -->
+<dom-module id="shared-styles">
+    <template>
+        <style>
+            paper-card {
+                margin: 24px;
+            }
+
+            paper-card .card-actions {
+                text-align: end;
+            }
+
+            paper-card .header {
+                margin: 1px 8px;
+                font-size: 20px;
+                font-family: var(--paper-font-common-base_-_font-family);
+                -webkit-font-smoothing: var(--paper-font-common-base_-_-webkit-font-smoothing);
+            }
+
+            paper-card .note {
+                font-size: 12px;
+                padding: 16px 8px 0 8px;
+                color: #555;
+            }
+
+            paper-datatable-card{
+                margin: 24px;
+                /* --paper-datatable-selection-toolbar-color: var(--paper-blue-100);
+                --paper-datatable-selection-toolbar-text-color: var(--paper-blue-700);
+                --paper-datatable-row-selection-color: var(--paper-blue-700); */
+			}
+
+            paper-fab.actions {
+                position: fixed;
+                right: 20px;
+                bottom: 20px;
+            }
+
+            paper-input {
+                margin-top: 0px;
+            }
+
+            paper-toast {
+                right: 0px;
+                left: auto !important;
+            }
+            .container {
+                @apply(--layout-horizontal);
+                /* @apply(--layout-wrap); */
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+
+            .flexchild2 {
+                @apply(--layout-flex-2);
+            }
+
+            .flexchild3 {
+                @apply(--layout-flex-3);
+            }
+
+            .header span{
+                font-size: 20px;
+                margin-left: 8px;
+            }
+        </style>
+    </template>
+</dom-module>

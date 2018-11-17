@@ -1,0 +1,22 @@
+{
+  "name": "api-gateway",
+  "version": "1.0.0",
+  "description": "Provides a single point of access for all microservices.",
+  "main": "serber.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Silver",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "dotenv-safe": "^5.0.1",
+    "express": "^4.16.3",
+    "express-http-proxy": "^1.2.0",
+    "helmet": "^3.12.0",
+    "http": "0.0.0",
+    "jsonwebtoken": "^8.2.1",
+    "morgan": "^1.9.0"
+  }
+}

@@ -1,0 +1,129 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../components/shared-styles.html">
+
+<dom-module id="page-permissions-form">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                margin: 16 0 !important;
+            }
+            .buttons {
+                margin-top: 20px;
+                text-align: end;
+                color: #f25380;
+            }
+            paper-checkbox {
+                --paper-checkbox-checked-color: #f25380;
+                margin: 16px 0;
+                width: 100%;
+            }
+        </style>
+
+        <div class="container">
+            <h2 class="flexchild">Editar Permissão</h2>
+        </div>
+        <paper-input label="Usuário" value="{{user.name}}"></paper-input>
+        <paper-input label="Módulo" value="{{permission.module}}"></paper-input>
+        <input type="hidden" value="{{permission.id}}" />
+        <paper-checkbox checked={{permission.read}}>Visualizar</paper-checkbox><br>
+        <paper-checkbox checked={{permission.write}}>Gravar</paper-checkbox>
+        <div class="buttons">
+            <paper-button dialog-dismiss on-tap="_onCancel">CANCEL</paper-button>
+            <paper-button dialog-confirm on-tap="_onConfirm">OK</paper-button>
+        </div>
+
+    </template>
+    <script>
+        class PagePermissionsForm extends Polymer.Element {
+
+            static get is() { return "page-permissions-form"; }
+
+            static get properties() {
+                return {
+                    user: Object,
+                    permission: Object
+                };
+            }
+
+            ready() {
+                super.ready();
+            }
+
+            _onConfirm() {
+                if(this._denyUpdateAdmin()) 
+                    return;
+
+                let self = this;
+
+                let p = this._checkExistPermissions();
+
+                p = p.map(function(e) {
+                    if(e.module == self.permission.module) {
+                        e.read = self.permission.read ? 1 : 0;
+                        e.write = self.permission.write ? 1 : 0;
+                    }
+                    return e;
+                });
+
+                this.user.permissions = JSON.stringify(p);
+
+                fetch('/api/users', {
+                    method: 'put',
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify(self.user)
+                })
+                .then(res => {
+                    if(res.status == 200) {
+                        Utils.toast("Operação executada com sucesso!");
+                        Utils.fireEvent("form-permission-event");
+                        self._onCancel();
+                    }
+                    else {
+                        Utils.toast(response.responseText, false);
+                    }
+                })
+                .catch(error => Utils.toast(error.message, false));
+            }
+
+            _checkExistPermissions() {
+                let p, self = this;
+
+                if(this.user.permissions == "") {
+                    p = [this.permission];
+                } 
+                else {
+                    p = JSON.parse(this.user.permissions);
+                }
+
+                let c = p.filter(function(e) {
+                    if(e.module == self.permission.module) {
+                        return true;
+                    }
+                });
+
+                if(c.length == 0) {
+                    p[p.length] = self.permission;
+                }
+
+                return p;
+            }
+
+             _denyUpdateAdmin(user) {
+                if(this.user.id == 1) {
+                    Utils.toast("Operação não permitida", false);
+                    return true
+                }
+
+                return false;
+            }
+
+            _onCancel() {
+                this.user = {};
+                this.permission = {};
+            }
+        }
+
+        window.customElements.define(PagePermissionsForm.is, PagePermissionsForm);
+    </script>
+</dom-module>

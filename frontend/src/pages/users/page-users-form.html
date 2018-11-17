@@ -1,0 +1,103 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../components/shared-styles.html">
+
+<dom-module id="page-users-form">    
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                margin: 16 0 !important;
+            }
+            .buttons {
+                margin-top: 20px;
+                text-align: end;
+                color: #f25380;
+            }
+            paper-checkbox {
+                text-align: end;
+                margin-top: 16px;
+                --paper-checkbox-checked-color: #f25380;
+            }
+        </style>
+
+        <div class="container">
+            <h2 class="flexchild">{{title}}</h2>
+            <paper-checkbox class="flexchild" checked={{user.status}}> Ativo</paper-checkbox>
+        </div>
+        <paper-input value="{{user.name}}" label="Nome"></paper-input>
+        <paper-input value="{{user.username}}" label="Usuário"></paper-input>
+        <paper-input value="{{user.email}}" label="Email"></paper-input>
+        <paper-dropdown-menu label="Departamento">
+            <paper-listbox slot="dropdown-content" selected="{{user.department}}">                
+                <template is="dom-repeat" items="{{departments}}">
+                    <paper-item value="{{item.value}}">{{item.name}}</paper-item> 
+                </template>                        
+            </paper-listbox>
+        </paper-dropdown-menu>
+        <div class="buttons">
+            <paper-button dialog-dismiss on-tap="_onCancel">CANCEL</paper-button>
+            <paper-button dialog-confirm on-tap="_onConfirm">OK</paper-button>
+        </div>
+        
+    </template>
+
+    <script>
+        class PageUsersForm extends Polymer.Element {
+            static get is() { return 'page-users-form'; }
+
+            static get properties() {
+                return {
+                    user: {
+                        type: Object,
+                        value: {}
+                    },
+                    title: String,
+                    departments: Array
+                }
+            }
+
+            ready() {
+                super.ready();
+            }
+
+            _onCancel() {
+                this.user = {};
+                Utils.fireEvent("form-event");
+            }
+
+            _onConfirm() {
+                if(this._denyUpdateAdmin()) return;
+
+                let self = this;
+                let method = this.user.id ? 'put' : 'post';
+                
+                this.user.status = this.user.status ? 1 : 0;
+
+                 Utils.fetchApi({
+                    resource: 'users',
+                    method: method,
+                    body: JSON.stringify(self.user)
+                }, res => {
+                    self.user = {};
+                    Utils.toast("Operação executada com sucesso!");
+                    Utils.fireEvent("form-user-event");
+                }, error => {
+                    Utils.toast(error.message, false);
+                });
+            }
+
+             _denyUpdateAdmin(user) {
+                if(this.user.id == 1) {
+                    Utils.toast("Operação não permitida", false);
+                    return true
+                }
+
+                return false;
+            }
+
+        }
+
+        window.customElements.define(PageUsersForm.is, PageUsersForm);
+    </script>
+    
+</dom-module>

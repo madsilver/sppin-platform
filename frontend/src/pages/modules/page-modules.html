@@ -1,0 +1,109 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">>
+<link rel="import" href="../../../components/shared-styles.html">
+
+<dom-module id="page-modules">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+            iframe {
+                width: 100%;
+                height: 300px;
+                border: none;
+            }
+        </style>
+
+        <div class="container">
+            <!-- table -->
+            <paper-datatable-card id="datatableCard" header="Módulos" data-source="{{modules}}" progress id-property="id" page-size="10" class="flexchild">
+                <div slot="toolbar-main">
+                </div>
+                <div slot="toolbar-select">
+                    <paper-icon-button icon="create" on-tap="_showData"></paper-icon-button>
+                </div>
+                <paper-datatable id="datatable" selectable>
+                    <paper-datatable-column header="Título" property="label" type="String" sortable></paper-datatable-column>
+                    <paper-datatable-column header="Nome" property="name" type="String" sortable></paper-datatable-column>
+                    <paper-datatable-column header="Ícone" property="icon" type="String" sortable></paper-datatable-column>
+                    <paper-datatable-column header="Color" property="color" type="String" sortable></paper-datatable-column>
+                </paper-datatable>
+            </paper-datatable-card>
+
+            <!-- dialog -->
+            <paper-dialog modal id="actionDialog" class="action" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+                <h2>Módulo</h2>
+
+                <div class="buttons">
+                    <paper-button dialog-dismiss on-tap="_onCancelDialog">OK</paper-button>
+                </div>
+            </paper-dialog>
+            
+        </div>
+
+        <div class="container">
+            <paper-card heading="" alt="home" class="flexchild">
+                <div class="card-content">
+                    <iframe id="demo-frame" class="style-scope catalog-element" src="https://npm-demos.appspot.com/@polymer/iron-icons@3.0.1/demo/index.html"></iframe>
+                </div>
+            </paper-card>
+        </div>
+
+    </template>
+
+    <script>
+        class PageModules extends Polymer.Element {
+            static get is() { return 'page-modules'; }
+
+            static get properties() {
+                return {
+                    modules: Object,
+                    dataModule: Object
+                };  
+            }
+
+            ready() {
+                super.ready();
+                this._fetchModules();
+
+                /* modal hack */
+                var body = document.querySelector('body');
+                Polymer.dom(body).appendChild(this.$.actionDialog);
+            }
+
+            _showData() {
+                this.dataModule = this.$.datatable.selectedItem;
+                this.$.actionDialog.open();
+            }
+
+            _onCancelDialog() {
+                this.dataModule = {};
+            }
+
+            _fetchModules() {
+                let self = this;
+
+                this.modules = {
+                    get: (sort, page, pageSize) => {
+                        let url = Utils.defineUrl('modules/', sort, page, pageSize);
+                        return new Promise(function(resolve, reject){
+
+                            fetch(url)
+                            .then(res => res.json())
+                            .then(res => {
+                                self.set('modules.length', res.length);
+                                resolve(res);
+                            })
+                            .catch(error => Utils.toast(error.message, false));
+
+                        });
+                    },
+                    length:0
+                };
+            }
+        }
+
+        window.customElements.define(PageModules.is, PageModules);
+    </script>
+</dom-module>

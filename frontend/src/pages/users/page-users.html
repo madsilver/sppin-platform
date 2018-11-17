@@ -1,0 +1,139 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../components/shared-styles.html">
+<link rel="import" href="page-users-form.html">
+
+<dom-module id="page-users">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+
+        <!-- table -->
+        <div class="container">
+            <paper-datatable-card id="datatableCard" header="Usuários" data-source="{{users}}" progress id-property="id" page-size="5" class="flexchild">
+                <div slot="toolbar-main">
+                </div>
+                <div slot="toolbar-select">
+                    <paper-icon-button icon="create" on-tap="_editItem"></paper-icon-button>
+                </div>
+                <paper-datatable id="datatable" selectable>
+                    <paper-datatable-column header="Nome" property="name" type="String" sortable></paper-datatable-column>
+                    <paper-datatable-column header="Usuário" property="username" type="String" sortable></paper-datatable-column>
+                    <paper-datatable-column header="Departamento" property="department" type="String" sortable format-value="{{_formatDepartment}}"></paper-datatable-column>
+                    <paper-datatable-column header="Status" property="status" type="String" sortable format-value="{{_formatStatus}}"></paper-datatable-column>
+                </paper-datatable>
+            </paper-datatable-card>            
+        </div>
+
+        <!-- dialog -->
+        <paper-dialog modal id="actionDialog" class="action" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+            <page-users-form user="{{user}}" title="{{currAction}}" departments="{{departments}}"></page-users-form>
+        </paper-dialog>
+
+        <!-- fab -->
+        <paper-fab icon="add" title="Add" class="actions" on-tap="_addItem"></paper-fab>
+
+    </template>
+
+    <script>
+        let swap;
+
+        class PageUsers extends Polymer.Element {
+            static get is() { return 'page-users'; }
+
+            static get properties() {
+                return {
+                    users: Object,
+                    user: Object,
+                    currAction: String,
+                    departments: {
+                        type: Array, 
+                        value: [],
+                        reflectToAttribute: true 
+                    }
+                };  
+            }
+
+            ready() {
+                super.ready();
+                this._fetchDepartments();
+                this._fetchUsers();
+
+                document.addEventListener("form-user-event", this._listenerForm.bind(this));
+
+                /* modal hack */
+                var body = document.querySelector('body');
+                Polymer.dom(body).appendChild(this.$.actionDialog);
+            }
+
+            _listenerForm(e) {
+                this.$.datatableCard.deselectAll();
+                this._fetchUsers();
+                this.user = {};
+            }
+
+            _fetchUsers() {
+                let self = this;
+
+                this.users = {
+                    get: (sort, page, pageSize) => {
+                        let url = Utils.defineUrl('users/page/', sort, page, pageSize);
+                        return new Promise((resolve, reject) => {
+
+                            Utils.fetchApi({
+                                resource: url
+                            }, res => {
+                                self.set('users.length', res.total);
+                                resolve(res.data);
+                            }, error => {
+                                Utils.toast(error.message, false);
+                            });
+
+                        });
+                    },
+                    length:0
+                };
+            }
+
+            _fetchDepartments() {
+                let self = this;
+
+                fetch('assets/departments.json')
+                .then(res => res.json())
+                .then(res => {
+                    self.departments = swap = res.departments;
+                })
+                .catch(error => Utils.toast(error.message, false));
+            }
+
+            _addItem() {
+                this.currAction = 'Novo Usuário';
+                this.$.actionDialog.open();
+            }
+
+            _editItem() {
+                this.currAction = 'Editar Usuário';
+                this.user = this.$.datatable.selectedItem;
+                this.$.actionDialog.open();
+            }
+
+            _formatDepartment(v) {
+                let department = swap.filter((e) => {
+                    return e.value == v;
+                })[0];
+
+                return department ? department.name : v;
+            }
+
+            _formatStatus(v) {
+                return v == 0 ? 'Inativo' : 'Ativo';
+            }
+        }
+
+        window.customElements.define(PageUsers.is, PageUsers);
+    </script>
+</dom-module>

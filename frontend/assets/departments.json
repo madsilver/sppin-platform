@@ -1,0 +1,16 @@
+{
+    "departments": [
+        { 
+            "name": "Admin", 
+            "value": 0 
+        },
+        { 
+            "name": "Atendimento", 
+            "value": 1 
+        },
+        { 
+            "name": "Financeiro", 
+            "value": 2 
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "name": "ms-log",
+    "version": "1.0.0",
+    "description": "Log microservice",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "author": "Silver",
+    "license": "ISC",
+    "dependencies": {
+        "app-root-path": "^2.1.0",
+        "body-parser": "^1.18.2",
+        "dotenv": "^6.0.0",
+        "express": "^4.16.3",
+        "knex": "^0.15.2",
+        "mysql": "^2.16.0"
+    }
+}

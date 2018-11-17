@@ -1,0 +1,149 @@
+<link rel="import" href="../components/elements.html">
+
+<dom-module id="scs-login">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+            .container {
+                display: -webkit-box;
+                display: -moz-box;
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: flex;
+                -webkit-flex-direction: column;
+                flex-direction: column;
+                min-height: 100vh;
+                position: relative; }
+
+            .container:before {
+                min-height: 30px;
+                -webkit-box-flex: 1;
+                box-flex: 1;
+                -webkit-flex-grow: 1;
+                flex-grow: 0.44;
+                content: '';
+                display: block;
+                height: 24px; }
+
+            paper-card.login {
+                -webkit-flex-shrink: 0;
+                flex-shrink: 0;
+                background: none;
+                display: block;
+                margin: 0 auto;
+                min-height: 0;
+                width: 300px;
+                flex-direction: column;
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+                max-width: 100%;
+                position: relative;
+                z-index: 2; 
+                box-shadow: none;}
+
+            paper-button.login {
+                width: 100%;
+                background: var(--paper-teal-500);
+                color: white;
+            }
+            paper-input {
+                --paper-input-container-focus-color: var(--paper-blue-400);
+                --paper-input-container-invalid-color: var(--paper-pink-400);
+            }
+            paper-dropdown-menu {
+                --paper-input-container-focus-color: var(--paper-blue-400);
+            }
+        </style>
+
+        <div class="container">
+            <paper-card heading="Login" alt="Login" class="flexchild login">
+                <div class="card-content">
+                    <paper-input id="username" label="Username" error-message="Field required" required></paper-input>
+                    <paper-input id="password" label="Password" error-message="Field required" type="password" required></paper-input>
+                </div>
+                <div class="card-actions">
+                    <paper-button raised on-tap="_login" class="login">Entrar</paper-button>
+                </div>
+            </paper-card>
+        </div>
+
+        <paper-toast id="toast"></paper-toast>
+
+    </template>
+
+    <script>
+        // Gesture events like tap and track generated from touch will not be
+        // preventable, allowing for better scrolling performance.
+        Polymer.setPassiveTouchGestures(true);
+
+        class ScsLogin extends Polymer.Element {
+            static get is() {
+                return 'scs-login';
+            }
+
+            ready() {
+                super.ready();
+                Polymer.toastElement = this.$.toast;
+
+                setTimeout(function(){
+                    this.$.username.focus();
+                }.bind(this), 100);
+            }
+
+            _login() {
+                if(this._invalid()) return;
+
+                let self = this;
+
+                let user = {
+                    username: this.$.username.value,
+                    password: MD5(this.$.password.value)
+                };
+
+                Utils.fetchApi({ 
+                    resource: 'login', 
+                    method: 'post',
+                    body: JSON.stringify(user)
+                },(res) => {
+                    if(res.error || res.data.length < 1) {
+                        let msg = res.error || 'Dados de usuário inválidos';
+                        Utils.toast(msg, false);
+                        return;
+                    }
+
+                    self._computeLogin(res);
+                },(error) => {
+                    Utils.toast(error.message, false);
+                });
+            }
+
+            _invalid() {
+                this.$.username.invalid = this.$.username.value == "";
+                this.$.password.invalid = this.$.password.value == "";
+
+                return this.$.username.invalid || this.$.password.invalid;
+            }
+
+            _computeLogin(res) {
+                if(res.auth) {
+                    sessionStorage.auth = res.auth;
+                    sessionStorage.token = res.token;
+                    window.location = "/";
+                }
+
+                if(res.data.length > 0) {
+                    sessionStorage.user = JSON.stringify(res.data[0]);
+                    return;
+                }
+            }
+
+        }
+
+        window.customElements.define(ScsLogin.is, ScsLogin);
+    </script>
+    <script src="../js/app-md5.js"></script>
+</dom-module>

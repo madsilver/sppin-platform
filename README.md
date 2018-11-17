@@ -1,1 +1,1 @@
-# sppin-platform
+# Sppin Platform

@@ -1,0 +1,61 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="elem-menu">
+    <template>
+        <style>
+
+            .blue   { color: var(--paper-blue-500); }
+            .orange { color: var(--paper-orange-500); }
+            .green  { color: var(--paper-green-500); }
+            .red    { color: var(--paper-red-500); }
+            .purple { color: var(--paper-purple-500); }
+            .brown  { color: var(--paper-brown-500); }
+            .grey   { color: var(--paper-grey-500); }
+
+            span.title-menu {
+                font-size: 14px;
+            }
+
+            .drawer-list a {
+                text-decoration: none;
+                color: black;
+            }
+
+            .drawer-list a.iron-selected {
+                font-weight: bold !important;
+                color: var(--paper-blue-500);
+            }
+
+        </style>
+
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+            <template is="dom-repeat" items="[[links]]">
+                <a name="[[item.name]]" href="[[rootPath]][[item.name]]">
+                    <paper-icon-item>
+                        <iron-icon icon="[[item.icon]]" slot="item-icon" class$="[[item.color]]"></iron-icon>
+                        <span class="title-menu">[[item.label]]</span>
+                    </paper-icon-item>
+                </a>
+            </template>
+        </iron-selector>
+
+    </template>
+
+  <script>
+      class ElemMenu extends Polymer.Element {
+          static get is() { return 'elem-menu'; }
+
+          static get properties() {
+              return {
+                  links: {
+                      type: Array,
+                      value: []
+                  },
+                  page: String
+              };  
+          }
+      }
+
+      window.customElements.define(ElemMenu.is, ElemMenu);
+  </script>
+</dom-module>

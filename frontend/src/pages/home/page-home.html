@@ -1,0 +1,36 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../components/shared-styles.html">
+
+<dom-module id="page-home">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+
+        <div class="container">
+
+            <paper-card heading="" alt="home" class="flexchild">
+                <div class="card-content">
+                    <div class="header">Bem Vindo!</div>
+                    <div class="note">
+                        O Sppin Cloud Service é o sistema da Sppin para gerenciamento corporativo.
+                    </div>
+                </div>    
+            </paper-card>
+
+        </div>
+
+    </template>
+
+  <script>
+      class PageHome extends Polymer.Element {
+          static get is() { return 'page-home'; }
+      }
+
+      window.customElements.define(PageHome.is, PageHome);
+  </script>
+</dom-module>
