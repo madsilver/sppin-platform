@@ -65,7 +65,7 @@
 
             _showData() {
                 var log = this.$.datatable.selectedItem;
-                this.dataLog = Utils.prettyJson(log.data);
+                this.dataLog = Helper.prettyJson(log.data);
                 this.$.actionDialog.open();
             }
 
@@ -78,16 +78,17 @@
 
                 this.logs = {
                     get: function(sort, page, pageSize){
-                        let url = Utils.defineUrl('logs/', sort, page, pageSize);
+                        let url = Helper.defineUrl('logs/', sort, page, pageSize);
                         return new Promise(function(resolve, reject){
 
-                            fetch(url)
-                            .then(res => res.json())
-                            .then(res => {
+                            Helper.fetchApi({
+                                resource: url
+                            }, res => {
                                 self.set('logs.length', res.total);
                                 resolve(res.data);
-                            })
-                            .catch(error => Utils.toast(error.message, false));
+                            }, error => {
+                                Helper.toast(error.message, false);
+                            });
 
                         });
                     },

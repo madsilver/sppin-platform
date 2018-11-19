@@ -43,7 +43,7 @@
             p[center] {
                 text-align: center;
                 font-size: 14px;
-                color: var(--paper-grey-500);
+                color: var(--paper-grey-600);
             }
         </style>
 
@@ -120,9 +120,7 @@
         Polymer.setPassiveTouchGestures(true);
 
         class ScsApp extends Polymer.Element {
-            static get is() {
-                return 'scs-app';
-            }
+            static get is() { return 'scs-app'; }
 
             static get properties() {
                 return {
@@ -158,18 +156,16 @@
 
                 if(sessionStorage.user)
                     this.user = JSON.parse(sessionStorage.user);
+
+                setInterval(() => this._supervisor(), 60000);
             }
 
             _fetchLinks() {
                 let self = this;
 
-                Utils.fetchApi({
-                    resource: 'modules'
-                }, res => {
-                    self.links = res;
-                }, error => {
-                    Utils.toast(error.message, false);
-                });
+                Helper.fetchApi({ resource: 'modules' }, 
+                res => { self.links = res.data.modules; }, 
+                error => { Helper.toast(error.message, false); });
             }
 
             _routePageChanged(page) {
@@ -203,7 +199,13 @@
             }
 
             _tapLogoff() {
-                Utils.logoff();
+                Helper.logoff();
+            }
+
+            _supervisor() {
+                Helper.fetchApi({ resource: 'logged' }, 
+                res => { Helper.isLogged(res); }, 
+                error => { Helper.toast(error.message, false); });
             }
         }
 

@@ -1,0 +1,75 @@
+version: '2'
+services:
+    # web:
+    #     image: nginx
+    #     container_name: web-sppin
+    #     volumes:
+    #         - ./frontend/:/usr/share/nginx/html/
+    #     ports:
+    #         - "80:80"
+
+    web:
+        image: madsilver/ubuntu-nodejs:latest
+        container_name: web-sppin
+        command: npm run start
+        volumes:
+            - ./frontend/:/usr/app/
+        ports:
+            - "80:8000"
+        links:
+            - api-gateway
+
+    api-gateway:
+        image: madsilver/ubuntu-nodejs:latest
+        container_name: api-sppin
+        command: npm run start
+        volumes:
+            - ./api-gateway/:/usr/app/
+        ports:
+            - "3000:3000"
+        links:
+            - ms-user
+            - ms-module
+            - ms-log
+
+    ms-user:
+        image: madsilver/ubuntu-nodejs:latest
+        container_name: ms-sppin-user
+        command: npm run start
+        volumes:
+            - ./microservices/ms-user/:/usr/app/
+        ports:
+            - "3001:3001"
+        links:
+            - db
+
+    ms-module:
+        image: madsilver/ubuntu-nodejs:latest
+        container_name: ms-sppin-module
+        command: npm run start
+        volumes:
+            - ./microservices/ms-module/:/usr/app/
+        ports:
+            - "3002:3002"
+        links:
+            - db
+
+    ms-log:
+        image: madsilver/ubuntu-nodejs:latest
+        container_name: ms-sppin-log
+        command: npm run start
+        volumes:
+            - ./microservices/ms-log/:/usr/app/
+        ports:
+            - "3003:3003"
+        links:
+            - db
+
+    db:
+        image: mysql:5.7
+        container_name: db-sppin
+        ports:
+            - "3306:3306"
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root

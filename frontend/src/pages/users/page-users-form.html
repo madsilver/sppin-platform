@@ -62,7 +62,7 @@
 
             _onCancel() {
                 this.user = {};
-                Utils.fireEvent("form-event");
+                Helper.fireEvent("form-event");
             }
 
             _onConfirm() {
@@ -73,22 +73,24 @@
                 
                 this.user.status = this.user.status ? 1 : 0;
 
-                 Utils.fetchApi({
+                Helper.fetchApi({
                     resource: 'users',
                     method: method,
                     body: JSON.stringify(self.user)
-                }, res => {
+                }, 
+                res => {
                     self.user = {};
-                    Utils.toast("Operação executada com sucesso!");
-                    Utils.fireEvent("form-user-event");
-                }, error => {
-                    Utils.toast(error.message, false);
+                    Helper.toast(res.message);
+                    Helper.fireEvent("form-user-event");
+                }, 
+                error => {
+                    Helper.toast(error.message, false);
                 });
             }
 
              _denyUpdateAdmin(user) {
                 if(this.user.id == 1) {
-                    Utils.toast("Operação não permitida", false);
+                    Helper.toast("Operação não permitida", false);
                     return true
                 }
 

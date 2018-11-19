@@ -1,7 +1,7 @@
-let Utils = {
+const Helper = {
 
-    fetchApi: function(param, done, error) {
-        const url = 'http://localhost:3000/' + param.resource;
+    fetchApi: (param, done, error) => {
+        const url = 'http://api-gateway:3000/' + param.resource;
 
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -14,44 +14,39 @@ let Utils = {
         })
         .then(res => res.json())
         .then(res => {
-            if(res.hasOwnProperty('auth')) {
-                if(!res.auth) {
-                    // this.logoff();
-                    // return;
-                }
-            }
+            Helper.isLogged(res);
             done(res)
         })
         .catch(err => error(err));
     },
 
-    defineUrl: function(resource, sort, page, pageSize) {
+    defineUrl: (resource, sort, page, pageSize) => {
         if(sort || page || pageSize) {
             resource = resource +`?page=${page}&limit=${pageSize}&sort=${sort.property}&order=${sort.direction}`;
         }
         return resource;
     },
 
-    loading: function(action) {
+    loading: (action) => {
         let screen = document.getElementById("screen");
         let loader = document.getElementById("loader");
         
         if(action) {
             if(screen)
                screen.classList.add("blur");
-            this.fadeIn(loader);
+            Helper.fadeIn(loader);
         }
         else {
             if(screen)
                 screen.classList.remove("blur");
-            this.fadeOut(loader);
+            Helper.fadeOut(loader);
         }
     },
 
-    fadeOut: function(el) {
+    fadeOut: (el) => {
         el.style.opacity = 1;
 
-        (function fade() {
+        (fade = () => {
             if ((el.style.opacity -= .1) < 0) {
                 el.style.display = "none";
             } else {
@@ -60,13 +55,13 @@ let Utils = {
         })();
     },
 
-    fadeIn: function(el, display) {
+    fadeIn: (el, display) => {
         if(el.style.opacity == 1 && el.style.display == "block") return;
 
         el.style.opacity = 0;
         el.style.display = display || "block";
 
-        (function fade() {
+        (fade = () => {
             var val = parseFloat(el.style.opacity);
             if (!((val += .1) > 1)) {
                 el.style.opacity = val;
@@ -75,7 +70,7 @@ let Utils = {
         })();  
     },
 
-    toast: function(msg, success) {
+    toast: (msg, success) => {
         let toast = Polymer.toastElement;
         if(toast == null) {
             alert(msg);
@@ -93,11 +88,11 @@ let Utils = {
         toast.open();
     },
 
-    prettyJson: function(json) {       
+    prettyJson: (json) => {       
         return JSON.stringify(JSON.parse(json),null,2);  
     },
 
-    fireEvent: function(name, data) {
+    fireEvent: (name, data) => {
         var event = new CustomEvent(name, {
             "detail": {
                 "message": data,
@@ -109,13 +104,25 @@ let Utils = {
         document.dispatchEvent(event);
     },
 
-    clone: function(obj) {
+    clone: (obj) => {
         return JSON.parse(JSON.stringify(obj));
     },
 
-    logoff: function() {
+    logoff: () => {
         sessionStorage.clear();
         document.location.reload();
+    },
+
+    isLogged: (res) => {
+        if(res.hasOwnProperty('auth')) {
+            if(!res.auth) {
+                Helper.toast('Sua sessão expirou, redirecionando para o login...', false);
+                setTimeout(() => {
+                    Helper.logoff();
+                }, 3000);
+                
+            }
+        }
     }
 
 };

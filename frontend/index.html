@@ -63,7 +63,7 @@
         <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
         <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 
-        <script src="/js/app-utils.js"></script>
+        <script src="/js/helper.js"></script>
 
         <!-- Load your application shell -->
         <link rel="import" href="/src/scs-app.html">
@@ -86,7 +86,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", event => { 
             const container = document.getElementById("appContainer");
-            el = sessionStorage.auth ? new ScsApp() : new ScsLogin();
+            el = sessionStorage.auth ? document.createElement('scs-app') : document.createElement('scs-login');
             container.appendChild(el);
         });
     </script>

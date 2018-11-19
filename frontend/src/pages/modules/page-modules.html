@@ -86,16 +86,15 @@
 
                 this.modules = {
                     get: (sort, page, pageSize) => {
-                        let url = Utils.defineUrl('modules/', sort, page, pageSize);
-                        return new Promise(function(resolve, reject){
+                        let url = Helper.defineUrl('modules', sort, page, pageSize);
+                        return new Promise((resolve, reject) => {
 
-                            fetch(url)
-                            .then(res => res.json())
-                            .then(res => {
-                                self.set('modules.length', res.length);
-                                resolve(res);
-                            })
-                            .catch(error => Utils.toast(error.message, false));
+                            Helper.fetchApi({ resource: url }, 
+                            res => {
+                                self.set('modules.length', res.data.count);
+                                resolve(res.data.modules);
+                            }, 
+                            error => { Helper.toast(error.message, false); });
 
                         });
                     },

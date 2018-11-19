@@ -40,7 +40,7 @@
     </template>
 
     <script>
-        let swap;
+        let swapDepartments;
 
         class PageUsers extends Polymer.Element {
             static get is() { return 'page-users'; }
@@ -81,17 +81,19 @@
 
                 this.users = {
                     get: (sort, page, pageSize) => {
-                        let url = Utils.defineUrl('users/page/', sort, page, pageSize);
+                        let url = Helper.defineUrl('users', sort, page, pageSize);
                         return new Promise((resolve, reject) => {
 
-                            Utils.fetchApi({
-                                resource: url
-                            }, res => {
-                                self.set('users.length', res.total);
-                                resolve(res.data);
-                            }, error => {
-                                Utils.toast(error.message, false);
-                            });
+                            Helper.fetchApi({resource: url}, 
+                            res => {
+                                if(!res.success) {
+                                    Helper.toast(res.message, false);
+                                    return;
+                                }
+                                self.set('users.length', res.data.count);
+                                resolve(res.data.users);
+                            }, 
+                            error => { Helper.toast(error.message, false); });
 
                         });
                     },
@@ -105,9 +107,9 @@
                 fetch('assets/departments.json')
                 .then(res => res.json())
                 .then(res => {
-                    self.departments = swap = res.departments;
+                    self.departments = swapDepartments = res.departments;
                 })
-                .catch(error => Utils.toast(error.message, false));
+                .catch(error => Helper.toast(error.message, false));
             }
 
             _addItem() {
@@ -122,7 +124,7 @@
             }
 
             _formatDepartment(v) {
-                let department = swap.filter((e) => {
+                let department = swapDepartments.filter((e) => {
                     return e.value == v;
                 })[0];
 

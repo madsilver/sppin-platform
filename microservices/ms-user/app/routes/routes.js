@@ -8,8 +8,6 @@ router.route('/')
     .post(controller.post)
     .put(controller.put);
 
-router.route('/page').get(controller.getPage);
-
 router.route('/login').post(controller.postLogin);
 
 module.exports = router;

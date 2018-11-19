@@ -32,7 +32,8 @@ const proxyLog = httpProxy(process.env.PROXY_LOG);
 
 app.post('/login', httpProxy(process.env.PROXY_USER, {
     userResDecorator: function(proxyRes, proxyResData, userReq, userRes) {
-        let data = JSON.parse(proxyResData.toString('utf8'));
+        let s = proxyResData.toString('utf8');
+        let data = JSON.parse(s);
         let res = helper.auth(data);
         return JSON.stringify(res);
     }
@@ -42,10 +43,16 @@ app.use('/users', helper.verifyJWT, (req, res, next) => proxyUser(req, res, next
 
 app.use('/modules', helper.verifyJWT, (req, res, next) => proxyModule(req, res, next));
 
-app.use('/modules', helper.verifyJWT, (req, res, next) => proxyLog(req, res, next));
+app.use('/logs', helper.verifyJWT, (req, res, next) => proxyLog(req, res, next));
 
-app.use('/logs', helper.verifyJWT, (req, res, next) => logServiceProxy(req, res, next));
+app.get('/logged', helper.verifyJWT, (req, res) => {
+    res.json({auth: req.userId});
+});
+
+app.get('/healthcheck', (req, res) => {
+    res.sendStatus(200);
+});
 
 app.listen(process.env.PORT, () => {
-  console.log(`server running at port ${process.env.PORT}`)
+    console.log(`server running at port ${process.env.PORT}`)
 });

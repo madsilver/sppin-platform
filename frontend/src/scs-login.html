@@ -104,21 +104,21 @@
                     password: MD5(this.$.password.value)
                 };
 
-                Utils.fetchApi({ 
+                Helper.fetchApi({ 
                     resource: 'login', 
                     method: 'post',
                     body: JSON.stringify(user)
-                },(res) => {
+                },
+                res => {
                     if(res.error || res.data.length < 1) {
                         let msg = res.error || 'Dados de usuário inválidos';
-                        Utils.toast(msg, false);
+                        Helper.toast(msg, false);
                         return;
                     }
 
                     self._computeLogin(res);
-                },(error) => {
-                    Utils.toast(error.message, false);
-                });
+                },
+                error => { Helper.toast(error.message, false); });
             }
 
             _invalid() {
@@ -145,5 +145,5 @@
 
         window.customElements.define(ScsLogin.is, ScsLogin);
     </script>
-    <script src="../js/app-md5.js"></script>
+    <script src="../js/md5.js"></script>
 </dom-module>

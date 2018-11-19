@@ -29,7 +29,7 @@ module.exports = {
         if(data.length > 0) {
             const id = data[0].id;
             token = jwt.sign({ id }, process.env.SECRET, {
-                expiresIn: 600
+                expiresIn: 1200 // 20 min
             });
             auth = true;
         }

@@ -94,17 +94,9 @@
             _fetchUsers() {
                 let self = this;
 
-                fetch('/api/users', {
-                    headers: {'Content-Type':'application/json'}
-                })
-                .then(res => res.json())
-                .then(res => {
-                    if(res.errno)
-                        Utils.toast(res.code, false);
-                    else
-                        self.users = res;
-                })
-                .catch(error => Utils.toast(error.message, false));
+                Helper.fetchApi({ resource: 'users' }, 
+                res => { self.users = res.data.users; }, 
+                error => { Helper.toast(error.message, false); });
             }
 
             _fetchPermissions() {
@@ -114,20 +106,17 @@
                     get: (sort, page, pageSize) => {
                         return new Promise((resolve, reject) => {
 
-                            fetch('/api/modules')
-                            .then(res => res.json())
-                            .then(res => {
-
-                                let parse = res.map((d, i) => {
+                            Helper.fetchApi({ resource: 'modules' }, 
+                            res => {
+                                let modules = res.data.modules;
+                                self.listPermissions = modules.map((d, i) => {
                                     return { id:i, module: d.name, read: 0, write: 0 };
                                 });
 
-                                self.listPermissions = parse;
-
-                                self.set('permissions.length', parse.length);
-                                resolve(parse);
-                            })
-                            .catch(error => Utils.toast(error.message, false));
+                                self.set('permissions.length', res.data.count);
+                                resolve(self.listPermissions);
+                            }, 
+                            error => { Helper.toast(error.message, false); });
 
                         });
                     },
@@ -145,15 +134,15 @@
 
             _fillPermissionsUser() {
                 if(!this.user || this.user.permissions == "") {
-                    Utils.fadeOut(this.$.datatableCard);
+                    Helper.fadeOut(this.$.datatableCard);
                     this._fetchPermissions(); // clean permission table
                     return;
                 }
 
-                Utils.fadeIn(this.$.datatableCard);
+                Helper.fadeIn(this.$.datatableCard);
 
                 let user = JSON.parse(this.user.permissions);
-                let list = Utils.clone(this.listPermissions);
+                let list = Helper.clone(this.listPermissions);
                 let self = this;
                 
                 for(let i=0; i < user.length; i++) {
@@ -179,7 +168,7 @@
 
             _editPermission() {
                 if(!this.user) {
-                    Utils.toast("Nenhum usuário selecionado", false);
+                    Helper.toast("Nenhum usuário selecionado", false);
                     this.$.datatableCard.deselectAll();
                     return;
                 }
@@ -191,26 +180,26 @@
 
             _save() {
                 if(!this.user) {
-                    Utils.toast("Nenhum usuário selecionado", false);
+                    Helper.toast("Nenhum usuário selecionado", false);
                 }
 
                 let self = this;
                 this.user.permissions = JSON.stringify(this.permissions);
 
-                fetch('/api/users', {
+                Helper.fetchApi({
+                    resource: 'users',
                     method: 'put',
-                    headers: {'Content-Type':'application/json'}, 
                     body: JSON.stringify(self.user)
-                })
-                .then(res => {
+                }, 
+                res => {
                     if(res.status == 200) {
-                        Utils.toast("Operação executada com sucesso!");
+                        Helper.toast("Operação executada com sucesso!");
                     }
                     else {
-                        Utils.toast(response.responseText, false);
+                        Helper.toast(res.message, false);
                     }
-                })
-                .catch(error => Utils.toast(error.message, false));
+                }, 
+                error => { Helper.toast(error.message, false); });
             }
 
             _cancel() {

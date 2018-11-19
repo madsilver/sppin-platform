@@ -1,6 +1,6 @@
 const appRoot = require('app-root-path');
 const knex = require(appRoot + '/app/config/knex/knex');
-const tablename = 'modules';
+const tablename = 'users';
 
 module.exports = {
 
@@ -16,9 +16,9 @@ module.exports = {
                 .limit(limit)
                 .offset(offset)
                 .orderBy(sort, order)
-                .then((modules) => {
+                .then((users) => {
                     callback({
-                        modules: modules,
+                        users: users,
                         count: total[0].count
                     })
                 })
@@ -26,19 +26,24 @@ module.exports = {
         });
     },
 
-    post: (module, callback) => {
-        knex(tablename)
-            .insert(module)
+    post: (user, callback) => {
+        knex(tablename).insert(user)
             .then(callback)
             .catch(callback);
     },
 
-    put: (module, callback) => {
-        knex(tablename).where('id', module.id)
-            .update(module)
+    put: (user, callback) => {
+        knex(tablename).where('id', user.id)
+            .update(user)
+            .then(callback)
+            .catch(callback);
+    },
+
+    getByLogin: (data, callback) => {
+        knex.select().from(tablename)
+            .where('username', data.username)
+            .where('password', data.password)
             .then(callback)
             .catch(callback);
     }
-
 };
-

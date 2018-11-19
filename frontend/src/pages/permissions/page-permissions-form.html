@@ -56,9 +56,7 @@
 
                 let self = this;
 
-                let p = this._checkExistPermissions();
-
-                p = p.map(function(e) {
+                let p = this._checkExistPermissions().map(e => {
                     if(e.module == self.permission.module) {
                         e.read = self.permission.read ? 1 : 0;
                         e.write = self.permission.write ? 1 : 0;
@@ -68,50 +66,45 @@
 
                 this.user.permissions = JSON.stringify(p);
 
-                fetch('/api/users', {
+                Helper.fetchApi({ 
+                    resource: 'users',
                     method: 'put',
-                    headers: {'Content-Type':'application/json'}, 
                     body: JSON.stringify(self.user)
-                })
-                .then(res => {
-                    if(res.status == 200) {
-                        Utils.toast("Operação executada com sucesso!");
-                        Utils.fireEvent("form-permission-event");
-                        self._onCancel();
-                    }
-                    else {
-                        Utils.toast(response.responseText, false);
-                    }
-                })
-                .catch(error => Utils.toast(error.message, false));
+                },
+                res => {
+                    Helper.toast(res.message);
+                    Helper.fireEvent("form-permission-event");
+                    self._onCancel();
+                },
+                error => { Helper.toast(error.message, false); });
             }
 
             _checkExistPermissions() {
-                let p, self = this;
+                let list;
 
                 if(this.user.permissions == "") {
-                    p = [this.permission];
+                    list = [this.permission];
                 } 
                 else {
-                    p = JSON.parse(this.user.permissions);
+                    list = JSON.parse(this.user.permissions);
                 }
 
-                let c = p.filter(function(e) {
-                    if(e.module == self.permission.module) {
+                let filter = list.filter(e => {
+                    if(e.module == this.permission.module) {
                         return true;
                     }
                 });
-
-                if(c.length == 0) {
-                    p[p.length] = self.permission;
+                
+                if(filter.length == 0) {
+                    list[list.length] = this.permission; //adds permission on user list
                 }
 
-                return p;
+                return list;
             }
 
              _denyUpdateAdmin(user) {
                 if(this.user.id == 1) {
-                    Utils.toast("Operação não permitida", false);
+                    Helper.toast("Operação não permitida", false);
                     return true
                 }
 
