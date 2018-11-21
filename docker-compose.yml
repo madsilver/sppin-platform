@@ -30,7 +30,6 @@ services:
         links:
             - ms-user
             - ms-module
-            - ms-log
 
     ms-user:
         image: madsilver/ubuntu-nodejs:latest
@@ -54,17 +53,6 @@ services:
         links:
             - db
 
-    ms-log:
-        image: madsilver/ubuntu-nodejs:latest
-        container_name: ms-sppin-log
-        command: npm run start
-        volumes:
-            - ./microservices/ms-log/:/usr/app/
-        ports:
-            - "3003:3003"
-        links:
-            - db
-
     db:
         image: mysql:5.7
         container_name: db-sppin
@@ -73,3 +61,5 @@ services:
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - ./data:/var/lib/mysql
