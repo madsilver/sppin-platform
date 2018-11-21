@@ -12,7 +12,9 @@ const Helper = {
             headers: headers,
             body: param.body
         })
-        .then(res => res.json())
+        .then(res => {
+            return res.ok ? res.json() : res;
+        })
         .then(res => {
             Helper.isLogged(res);
             done(res)

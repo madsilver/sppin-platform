@@ -18,12 +18,6 @@ exports.seed = function (knex, Promise) {
                 color: 'orange'
               },
               {
-                name: 'logs',
-                label: 'Logs',
-                icon: 'icons:history',
-                color: 'green'
-              },
-              {
                 name: 'settings',
                 label: 'Configurações',
                 icon: 'icons:settings',

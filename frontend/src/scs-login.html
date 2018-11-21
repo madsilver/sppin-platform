@@ -110,8 +110,8 @@
                     body: JSON.stringify(user)
                 },
                 res => {
-                    if(res.error || res.data.length < 1) {
-                        let msg = res.error || 'Dados de usuário inválidos';
+                    if(!res.auth || res.data.length < 1) {
+                        let msg = res.statusText || 'Dados de usuário inválidos';
                         Helper.toast(msg, false);
                         return;
                     }
@@ -133,11 +133,11 @@
                     sessionStorage.auth = res.auth;
                     sessionStorage.token = res.token;
                     window.location = "/";
-                }
 
-                if(res.data.length > 0) {
-                    sessionStorage.user = JSON.stringify(res.data[0]);
-                    return;
+                    if(res.data.length > 0) {
+                        sessionStorage.user = JSON.stringify(res.data[0]);
+                        return;
+                    }
                 }
             }
 

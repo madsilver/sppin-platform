@@ -1,0 +1,43 @@
+version: '2'
+services:
+
+    logspout:
+        image: amouat/logspout-logstash
+        container_name: logspout-sppin
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock
+        ports:
+            - "8000:80"
+        links:
+            - logstash
+        command: logstash://logstash:5000
+
+    logstash:
+        image: logstash:2
+        container_name: logstash-sppin
+        volumes:
+            - ./env/logstash.conf:/etc/logstash.conf
+        environment:
+            LOGSPOUT: ignore
+        links:
+            - elasticsearch
+        command: -f /etc/logstash.conf
+
+    elasticsearch:
+        image: elasticsearch:2.4
+        container_name: elasticsearch-sppin
+        environment:
+            LOGSPOUT: ignore
+        ports: 
+            - "9200:9200"
+
+    kibana:
+        image: kibana:4
+        container_name: kibana-sppin
+        environment:
+            LOGSPOUT: ignore
+            ELASTICSEARCH_URL: http://elasticsearch:9200
+        links:
+            - elasticsearch
+        ports:
+            - "5601:5601"
