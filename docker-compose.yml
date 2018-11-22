@@ -12,17 +12,6 @@ services:
         links:
             - api-gateway
 
-    # web:
-    #     image: madsilver/ubuntu-nodejs:latest
-    #     container_name: web-sppin
-    #     command: npm run start
-    #     volumes:
-    #         - ./frontend/:/usr/app/
-    #     ports:
-    #         - "80:8000"
-    #     links:
-    #         - api-gateway
-
     api-gateway:
         image: madsilver/ubuntu-nodejs:latest
         container_name: api-sppin
@@ -66,4 +55,4 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: root
         volumes:
-            - ./data:/var/lib/mysql
+            - ./data/mysql:/var/lib/mysql
