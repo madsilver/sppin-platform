@@ -6,7 +6,7 @@ services:
         container_name: web-sppin
         volumes:
             - ./env/default.conf:/etc/nginx/conf.d/default.conf
-            - ./frontend/:/usr/share/nginx/html/
+            - ./frontend/dist:/usr/share/nginx/html/
         ports:
             - "80:80"
         links:
