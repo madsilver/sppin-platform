@@ -116,7 +116,7 @@ const Helper = {
     },
 
     isLogged: (res) => {
-        if(res.hasOwnProperty('auth')) {
+        if(res.hasOwnProperty('auth') || res.status == 401) {
             if(!res.auth) {
                 Helper.toast('Sua sessão expirou, redirecionando para o login...', false);
                 setTimeout(() => {

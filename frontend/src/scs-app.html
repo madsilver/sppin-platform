@@ -87,7 +87,6 @@
 
                     <page-home name="home"></page-home>
                     <page-users name="users"></page-users>
-                    <page-logs name="logs"></page-logs>
                     <page-settings name="settings"></page-settings>
                 </iron-pages>
 
@@ -156,6 +155,8 @@
 
                 if(sessionStorage.user)
                     this.user = JSON.parse(sessionStorage.user);
+
+                this._supervisor();
 
                 setInterval(() => this._supervisor(), 60000);
             }
