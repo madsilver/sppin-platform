@@ -1,3 +1,4 @@
 .vscode
 data
 *.pem
+npm-debug.log
