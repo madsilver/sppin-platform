@@ -5,6 +5,8 @@ services:
         image: elasticsearch:2.4
         container_name: elasticsearch-sppin
         restart: always
+        volumes:
+            - ./data/elasticsearch:/usr/share/elasticsearch/data
         environment:
             LOGSPOUT: ignore
         ports: 
