@@ -5,7 +5,7 @@ services:
         image: nginx
         container_name: web-sppin
         volumes:
-            - ./env/default.conf:/etc/nginx/conf.d/default.conf
+            - ./env/nginx/web.conf:/etc/nginx/conf.d/default.conf
             - ./frontend/dist:/usr/share/nginx/html/
         ports:
             - "80:80"
@@ -13,10 +13,11 @@ services:
             - api-gateway
 
     api-gateway:
-        image: madsilver/ubuntu-nodejs:latest
+        image: madsilver/nginx-nodejs:latest
         container_name: api-sppin
         command: npm run start
         volumes:
+            - ./env/nginx/api.conf:/etc/nginx/conf.d/default.conf
             - ./api-gateway/:/usr/app/
         ports:
             - "3000:3000"
