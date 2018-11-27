@@ -1,7 +1,7 @@
 const Helper = {
 
     fetchApi: (param, done, error) => {
-        const url = 'http://api-gateway:3000/' + param.resource;
+        const url = 'http://proxy:8080/' + param.resource;
 
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');

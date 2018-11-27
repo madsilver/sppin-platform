@@ -10,20 +10,29 @@ services:
         ports:
             - "80:80"
         links:
-            - api-gateway
+            - proxy
 
     api-gateway:
-        image: madsilver/nginx-nodejs:latest
+        image: madsilver/ubuntu-nodejs:latest
         container_name: api-sppin
         command: npm run start
         volumes:
-            - ./env/nginx/api.conf:/etc/nginx/conf.d/default.conf
             - ./api-gateway/:/usr/app/
         ports:
             - "3000:3000"
         links:
             - ms-user
             - ms-module
+
+    proxy:
+        image: stepankuzmin/nginx-with-redis
+        container_name: proxy-api
+        volumes:
+            - ./env/nginx/proxy.conf:/etc/nginx/conf.d/default.conf:ro
+        ports:
+            - "8080:8080"
+        links:
+            - api-gateway
 
     ms-user:
         image: madsilver/ubuntu-nodejs:latest
